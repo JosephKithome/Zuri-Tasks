@@ -3,28 +3,48 @@ import time
 import progressbar
 import numpy as np
 import json
+import sqlite3
+from sqlite3 import Error
+import os
 
 
 
 userDatabase ={}
 bankname ='JosephBank'
 
+# def sql_database():
+#     conn = sqlite3.connect('Client_data.db') #Opens Connection to SQLite database file.
+#     conn.execute('''CREATE TABLE Client_db
+#                 (FIRSTNAME            BLOB NOT NULL,
+#                 LASTNAME         BLOB NOT NULL,
+#                 PASSWORD         BLOB NOT NULL,
+#                 EMAIL            BLOB  NOT NULL,
+#                 ACCONTNUMBER     BLOB NOT NULL  
+                
+#                 );''') #Creates the table
+#     conn.commit() # Commits the entries to the database
+#     conn.close
+
 def main():
+    #setting the selected option to be false when user has not selected anything
+    isValidOption = False
+
     print('Do you have an account with %s' %bankname)
     
-    selectedOption = int(input('1:yes 2:No\n'))
+    while isValidOption  == False:
+        selectedOption = int(input('1:yes 2:No\n'))
+        if (selectedOption==1):
+            isValidOption = True
+            login()
 
-    if (selectedOption==1):
-
-        login()
-
-    elif(selectedOption==2):
+        elif(selectedOption==2):
+            isValidOption = True
+            
+            register()
+        else:
+            print('Invalid option')
+            
         
-        register()
-    elif(selectedOption >2):
-        print('Option out of range,Would you like to Register?')
-        revert()
-       
        
 
 def login():
@@ -36,11 +56,14 @@ def login():
     print('***********Login**********')
     account_number =int(input('Enter your Account number:'))
     userpassword =input('Enter password:')
+
     #loop through the database which is dictionary datatype 
     for accountNumber,userAccountDetails in userDatabase.items():
         print(account_number)
+
         #if account number provided by user matches the one in database
         if(accountNumber == account_number):
+
             # if password matches the one in database
             if(userAccountDetails[3] == userpassword):
                 bankOperations(userAccountDetails)
@@ -77,7 +100,8 @@ def register():
     print("Your account number is: %d" % accountNumber)
     print("Make sure you keep it safe")
     print(" == ==== ====== ===== ===")
-
+    
+    #saving the created user in a json file
     with open('UserDatabase.json', 'w') as file:
         json.dump(userDatabase, file)
     
@@ -92,20 +116,30 @@ def generationAccountNumber():
 def bankOperations(user):
     print('Welcome %s %s' %(user[0],user[1]))  
 
-    selectedOption = int(input("What would you like to do? (1) deposit (2) withdrawal (3) Logout (4) Exit \n")) 
+    isChoiceValid = False
 
-    if(selectedOption ==1):
-        deposit(user)
-    elif(selectedOption==2):
-        withdraw(user)
-    elif(selectedOption ==3):
-        logout()
-    elif(selectedOption==4):
-        exit()  
-    else:
-        print("Invalid option selected")
-        bankOperation(user)
-                    
+    while isChoiceValid ==False:
+        selectedOption = int(input("What would you like to do? (1) deposit (2) withdrawal (3) Logout (4) Exit \n")) 
+
+        if(selectedOption ==1):
+            isChoiceValid =True
+            deposit(user)
+
+        elif(selectedOption==2):
+            withdraw(user)
+            isChoiceValid =True
+            
+        elif(selectedOption ==3):
+            isChoiceValid =True
+            logout()
+            
+        elif(selectedOption==4):
+            isChoiceValid =True
+            exit()  
+        else:
+            print("Invalid option selected")
+            
+                        
 def deposit(user):
     current_balance = 50000
     deposit = int(input('How much do you want to deposit?\n'))
