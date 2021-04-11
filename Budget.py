@@ -30,5 +30,5 @@ entertainment = Budget('Budget')
 
 print(food.Withdrawal(20))
 print(clothing.transfer(40))
-print(entertainment)
+print(entertainment.Deposit(500))
 
