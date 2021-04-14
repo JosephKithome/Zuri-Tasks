@@ -9,7 +9,7 @@ import os
 
 
 
-userDatabase ={}
+userDatabase ={5332077270: ['joseph', 'kithome', 'jmulingwakithome.jmk@gmail.com', 'password1',7800],1890789781: ['jacks', 'jaymoh', 'jacks.jmk@gmail.com', 'password2',5000]}
 bankname ='JosephBank'
 
 # def sql_database():
@@ -59,7 +59,6 @@ def login():
 
     #loop through the database which is dictionary datatype 
     for accountNumber,userAccountDetails in userDatabase.items():
-        print(account_number)
 
         #if account number provided by user matches the one in database
         if(accountNumber == account_number):
@@ -119,7 +118,7 @@ def bankOperations(user):
     isChoiceValid = False
 
     while isChoiceValid ==False:
-        selectedOption = int(input("What would you like to do? (1) deposit (2) withdrawal (3) Logout (4) Exit \n")) 
+        selectedOption = int(input("What would you like to do? (1) deposit (2) withdrawal (3) transfer (4) Logout (6)exit \n")) 
 
         if(selectedOption ==1):
             isChoiceValid =True
@@ -131,28 +130,45 @@ def bankOperations(user):
             
         elif(selectedOption ==3):
             isChoiceValid =True
-            logout()
+            transfer(user)
             
         elif(selectedOption==4):
             isChoiceValid =True
-            exit()  
+            logout()  
+        elif(selectedOption == 5):
+            exit()    
         else:
             print("Invalid option selected")
             
                         
 def deposit(user):
-    current_balance = 50000
+    # current_balance = 50000
+    current_balance = get_balance(user) 
     deposit = int(input('How much do you want to deposit?\n'))
-    final_balance = current_balance + deposit
+    final_balance = get_balance() + deposit
     print('Deposit successful\n Balance: %d' %final_balance ,'\n Thankyou and welcome again')
     bankOperations(user)
 
 def transfer(user):
-    current_balance = 50000
-    deposit = int(input('How much do you want to deposit?\n'))
-    final_balance = current_balance + deposit
-    print('Deposit successful\n Balance: %d' %final_balance)
-    bankOperations(user)
+    current_balance = get_balance(user)
+    transfer_amount = int(input('How much do you want to transfer?\n'))
+    if transfer_amount < current_balance:
+        if transfer_amount < 500:
+            account_number2 = get_account(user)
+            transfer_account =int(input("Please enter account number to transfer funds:"))
+            balance = current_balance - amount
+            print('Transfer success\n Account balance is  %d:' %balance ,'\n transfered to account number %d' %transfer_account)
+
+            for account,value in userDatabase.items():
+                if account == transfer_account:
+                    amount = int(input('Please enter amount to transfer:'))
+                    if account == account_number2:
+                        balance = current_balance - amount
+                        print('Transfer success\n Account balance is  %d:' %balance ,'\n transfered to account number %d' %account)
+
+        
+
+
     
 def withdraw(user):
     current_balance = 50000
@@ -165,6 +181,13 @@ def withdraw(user):
     print("Take your cash : %d" %amount) 
     print('Current balance : %d' % balance)   
     bankOperations(user)
+
+def get_balance(user):
+    return user[4]
+
+def get_account(user):
+    return user[0] #This gets the account number    
+
 def logout():
     login()        
       
