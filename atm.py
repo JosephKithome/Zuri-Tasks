@@ -6,24 +6,13 @@ import json
 import sqlite3
 from sqlite3 import Error
 import os
+import account_Validation
+import database
 
 
 
-userDatabase ={5332077270: ['joseph', 'kithome', 'jmulingwakithome.jmk@gmail.com', 'password1',7800],1890789781: ['jacks', 'jaymoh', 'jacks.jmk@gmail.com', 'password2',5000]}
-bankname ='JosephBank'
-
-# def sql_database():
-#     conn = sqlite3.connect('Client_data.db') #Opens Connection to SQLite database file.
-#     conn.execute('''CREATE TABLE Client_db
-#                 (FIRSTNAME            BLOB NOT NULL,
-#                 LASTNAME         BLOB NOT NULL,
-#                 PASSWORD         BLOB NOT NULL,
-#                 EMAIL            BLOB  NOT NULL,
-#                 ACCONTNUMBER     BLOB NOT NULL  
-                
-#                 );''') #Creates the table
-#     conn.commit() # Commits the entries to the database
-#     conn.close
+# userDatabase ={5332077270: ['joseph', 'kithome', 'jmulingwakithome.jmk@gmail.com', 'password1',7800],1890789781: ['jacks', 'jaymoh', 'jacks.jmk@gmail.com', 'password2',5000]}
+bankname ='$$$$$$====JosephBank======$$$$$$'
 
 def main():
     #setting the selected option to be false when user has not selected anything
@@ -54,22 +43,28 @@ def login():
         print(json_data)
 
     print('***********Login**********')
-    account_number =int(input('Enter your Account number:'))
-    userpassword =input('Enter password:')
+    account_number = input('Enter your Account number:')
+    is_valid_account_number = account_Validation.account_number_validation(account_number)
 
-    #loop through the database which is dictionary datatype 
-    for accountNumber,userAccountDetails in userDatabase.items():
+    if is_valid_account_number:
+        userpassword =input('Enter password:')
 
-        #if account number provided by user matches the one in database
-        if(accountNumber == account_number):
+        #loop through the database which is dictionary datatype 
+        for accountNumber,userAccountDetails in userDatabase.items():
 
-            # if password matches the one in database
-            if(userAccountDetails[3] == userpassword):
-                bankOperations(userAccountDetails)
-            print('Incorrect password')    
-                   
-        print('Account number doesn\'t  exist in our database')  
-        login()          
+            #if account number provided by user matches the one in database
+            if(accountNumber == int(account_number)):
+
+                # if password matches the one in database
+                if(userAccountDetails[3] == userpassword):
+                    bankOperations(userAccountDetails)
+                print('Incorrect password')    
+                    
+            print('Account number doesn\'t  exist in our database')  
+            login()  
+    else:
+        main()            
+
 
 def register():
     print('*********Register*********')
@@ -78,34 +73,44 @@ def register():
     email = input('Enter your email address :')
     password =input('Enter password :')
     #   password2 =input('Confirm password :')
-
-    accountNumber = generationAccountNumber()
+    try:
+        accountNumber = generationAccountNumber()
+    except ValueError:
+        print("Account number failed due to technical probles")  
+        main()  
 
     # create user for the generated random  account number
-    userDatabase[accountNumber] =[firsname,lastname,email,password]
+    # userDatabase[accountNumber] =[firsname,lastname,email,password]
 
-    time.sleep(0.1)
-    print('Creating account,Please wait...')
+    is_user_created = database.create(accountNumber,[firsname,lastname,email,password])
 
-    time.sleep(0.3)
+    if is_user_created:
 
-    print('Generating account number')
-    for i in progressbar.progressbar(range(100)):
-        time.sleep(0.02)
+        time.sleep(0.1)
+        print('Creating account,Please wait...')
+
+        time.sleep(0.3)
+
+        print('Generating account number')
+        for i in progressbar.progressbar(range(100)):
+            time.sleep(0.02)
+            
+        time.sleep(0.1)
+        print("Your Account Has been created")
+        print(" == ==== ====== ===== ===")
+        print("Your account number is: %d" % accountNumber)
+        print("Make sure you keep it safe")
+        print(" == ==== ====== ===== ===")
         
-    time.sleep(0.1)
-    print("Your Account Has been created")
-    print(" == ==== ====== ===== ===")
-    print("Your account number is: %d" % accountNumber)
-    print("Make sure you keep it safe")
-    print(" == ==== ====== ===== ===")
-    
-    #saving the created user in a json file
-    with open('UserDatabase.json', 'w') as file:
-        json.dump(userDatabase, file)
-    
+        # #saving the created user in a json file
+        # with open('UserDatabase.json', 'w') as file:
+        #     json.dump(database.create, file)
+        
 
-    login()
+        login()
+    else:
+        print("Something went wrong,Please try again")
+        register()    
 
         
 def generationAccountNumber():
